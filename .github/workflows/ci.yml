@@ -1,13 +1,11 @@
 name: Continuous integration
-on: [push, pull_request]
+on: pull_request
 
 jobs:
     check-formatting:
-        name: Check formatting
         uses: edpft/rust-workflows/.github/workflows/check-formatting.yml@main
     
     lint:
-        name: Lint
         uses: edpft/rust-workflows/.github/workflows/lint.yml@main
     
     test:

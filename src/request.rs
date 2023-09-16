@@ -30,6 +30,9 @@ pub enum RequestBody {
         msg_id: usize,
         echo: String,
     },
+    Generate {
+        msg_id: usize,
+    },
 }
 
 impl RequestBody {
@@ -37,6 +40,7 @@ impl RequestBody {
         let str = match self {
             RequestBody::Echo { .. } => "echo",
             RequestBody::Init { .. } => "init",
+            RequestBody::Generate { .. } => "generate",
         };
         str.to_string()
     }
