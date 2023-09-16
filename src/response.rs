@@ -1,6 +1,7 @@
 use std::fmt;
 
 use serde::Serialize;
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Response {
@@ -37,5 +38,9 @@ pub enum ResponseBody {
         msg_id: usize,
         in_reply_to: usize,
         echo: String,
+    },
+    GenerateOk {
+        in_reply_to: usize,
+        id: Uuid,
     },
 }
