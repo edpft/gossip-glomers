@@ -10,5 +10,4 @@ on:
 
 jobs:
     audit:
-        name: Audit
         uses: edpft/rust-workflows/.github/workflows/audit.yml@main
