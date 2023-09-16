@@ -1,0 +1,6 @@
+name: Continuous integration
+on: [push, pull_request]
+
+jobs:
+    call-ci-workflow:
+            uses: edpft/rust-workflows/.github/workflows/ci.yml
