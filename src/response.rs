@@ -29,18 +29,17 @@ impl fmt::Display for Response {
 }
 
 #[derive(Debug, Serialize, PartialEq, Eq, PartialOrd, Ord)]
-#[serde(rename_all = "snake_case", tag = "type")]
+#[serde(tag = "type")]
 pub enum ResponseBody {
-    InitOk {
-        in_reply_to: usize,
-    },
-    EchoOk {
+    // clippy doesn't like the repeated postfixes
+    #[serde(rename = "init_ok")]
+    Init { in_reply_to: usize },
+    #[serde(rename = "echo_ok")]
+    Echo {
         msg_id: usize,
         in_reply_to: usize,
         echo: String,
     },
-    GenerateOk {
-        in_reply_to: usize,
-        id: Uuid,
-    },
+    #[serde(rename = "generate_ok")]
+    Generate { in_reply_to: usize, id: Uuid },
 }
