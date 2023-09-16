@@ -1,0 +1,7 @@
+name: Auto Merge
+
+on: pull_request
+
+jobs:
+    auto-merge:
+        uses: edpft/rust-workflows/.github/workflows/auto-merge.yml@main
