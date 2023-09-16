@@ -16,5 +16,6 @@ Cargo.lock
 # direnv directory
 .direnv/
 
-# maelstrom directory
+# maelstrom directories
 maelstrom/
+store/
