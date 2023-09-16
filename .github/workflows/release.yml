@@ -1,0 +1,12 @@
+name: Release
+
+on:
+    push:
+      branches:
+        - main
+
+jobs:
+    auto-merge:
+        uses: edpft/rust-workflows/.github/workflows/release-please.yml@main
+        with:
+            package-name: "gossip-glomers"
