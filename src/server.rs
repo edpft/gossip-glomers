@@ -44,7 +44,7 @@ impl Server {
                 node_id: _,
                 node_ids: _,
             } => {
-                let response_body = ResponseBody::InitOk {
+                let response_body = ResponseBody::Init {
                     in_reply_to: msg_id,
                 };
                 let response = Response::new(&self.node_id, request.src, response_body);
@@ -65,14 +65,14 @@ impl Server {
                 let error = Error::AlreadyInitialised;
                 Err(error)?
             }
-            RequestBody::Echo { msg_id, echo } => ResponseBody::EchoOk {
+            RequestBody::Echo { msg_id, echo } => ResponseBody::Echo {
                 msg_id: self.msg_id,
                 in_reply_to: msg_id,
                 echo,
             },
             RequestBody::Generate { msg_id } => {
                 let id = Uuid::new_v4();
-                ResponseBody::GenerateOk {
+                ResponseBody::Generate {
                     in_reply_to: msg_id,
                     id,
                 }
