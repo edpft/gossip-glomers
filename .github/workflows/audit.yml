@@ -9,5 +9,6 @@ on:
       - cron: '0 0 * * *'
 
 jobs:
-    call-audit-workflow:
-            uses: edpft/rust-workflows/.github/workflows/audit.yml
+    audit:
+        name: Audit
+        uses: edpft/rust-workflows/.github/workflows/audit.yml@main
