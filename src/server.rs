@@ -1,3 +1,5 @@
+use uuid::Uuid;
+
 use crate::{
     error::Error,
     request::{Request, RequestBody},
@@ -58,21 +60,26 @@ impl Server {
     }
 
     pub fn handle_request(&mut self, request: Request) -> color_eyre::Result<Response> {
-        match request.body {
+        let response_body = match request.body {
             RequestBody::Init { .. } => {
                 let error = Error::AlreadyInitialised;
                 Err(error)?
             }
-            RequestBody::Echo { msg_id, echo } => {
-                let reply_body = ResponseBody::EchoOk {
-                    msg_id: self.msg_id,
+            RequestBody::Echo { msg_id, echo } => ResponseBody::EchoOk {
+                msg_id: self.msg_id,
+                in_reply_to: msg_id,
+                echo,
+            },
+            RequestBody::Generate { msg_id } => {
+                let id = Uuid::new_v4();
+                ResponseBody::GenerateOk {
                     in_reply_to: msg_id,
-                    echo,
-                };
-                let response = Response::new(&self.node_id, request.src, reply_body);
-                self.msg_id += 1;
-                Ok(response)
+                    id,
+                }
             }
-        }
+        };
+        let response = Response::new(&self.node_id, request.src, response_body);
+        self.msg_id += 1;
+        Ok(response)
     }
 }
