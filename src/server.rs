@@ -9,6 +9,7 @@ use crate::{
 pub struct Server {
     node_id: String,
     msg_id: usize,
+    messages_seen: Vec<usize>,
 }
 
 impl Server {
@@ -16,6 +17,7 @@ impl Server {
         Self {
             node_id: node_id.into(),
             msg_id: 0,
+            messages_seen: Vec::new(),
         }
     }
 
@@ -75,6 +77,13 @@ impl Server {
                 ResponseBody::Generate {
                     in_reply_to: msg_id,
                     id,
+                }
+            }
+            RequestBody::Broadcast { message, msg_id } => {
+                self.messages_seen.push(message);
+                ResponseBody::Broadcast {
+                    msg_id: self.msg_id,
+                    in_reply_to: msg_id,
                 }
             }
         };
