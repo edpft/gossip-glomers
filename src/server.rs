@@ -76,3 +76,23 @@ impl Server {
         Ok(response)
     }
 }
+
+impl TryFrom<&Request> for Server {
+    type Error = Error;
+
+    fn try_from(request: &Request) -> Result<Self, Self::Error> {
+        match &request.body.payload {
+            RequestPayload::Init {
+                node_id,
+                node_ids: _,
+            } => {
+                let server = Server::new(node_id);
+                Ok(server)
+            }
+            _ => {
+                let error = Error::Initialisation;
+                Err(error)?
+            }
+        }
+    }
+}
