@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use uuid::Uuid;
 
 use crate::{
@@ -9,7 +11,7 @@ use crate::{
 pub struct Server {
     node_id: String,
     msg_id: usize,
-    messages_seen: Vec<usize>,
+    messages_seen: Option<HashSet<usize>>,
 }
 
 impl Server {
@@ -17,7 +19,7 @@ impl Server {
         Self {
             node_id: node_id.into(),
             msg_id: 0,
-            messages_seen: Vec::new(),
+            messages_seen: None,
         }
     }
 
@@ -78,7 +80,13 @@ impl Server {
                 }
             }
             RequestBody::Broadcast { message, msg_id } => {
-                self.messages_seen.push(message);
+                if self.messages_seen.is_none() {
+                    let messages_seen = HashSet::new();
+                    self.messages_seen = Some(messages_seen);
+                };
+                self.messages_seen
+                    .as_mut()
+                    .map(|messages_seen| messages_seen.insert(message));
                 ResponseBody::Broadcast {
                     msg_id: self.msg_id,
                     in_reply_to: msg_id,
