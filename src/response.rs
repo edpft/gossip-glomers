@@ -1,9 +1,9 @@
-use std::fmt;
+use std::{collections::HashSet, fmt};
 
 use serde::Serialize;
 use uuid::Uuid;
 
-#[derive(Debug, Serialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Serialize, PartialEq, Eq)]
 pub struct Response {
     src: String,
     dest: String,
@@ -28,7 +28,7 @@ impl fmt::Display for Response {
     }
 }
 
-#[derive(Debug, Serialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Serialize, PartialEq, Eq)]
 #[serde(tag = "type")]
 pub enum ResponseBody {
     // clippy doesn't like the repeated postfixes
@@ -48,7 +48,7 @@ pub enum ResponseBody {
     Read {
         msg_id: usize,
         in_reply_to: usize,
-        messages: Vec<usize>,
+        messages: Option<HashSet<usize>>,
     },
     #[serde(rename = "topology_ok")]
     Topology { msg_id: usize, in_reply_to: usize },
