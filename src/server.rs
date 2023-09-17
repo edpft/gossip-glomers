@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use uuid::Uuid;
 
@@ -8,11 +8,13 @@ use crate::{
     response::{Response, ResponseBody, ResponsePayload},
 };
 
+type MessageSeen = Option<HashSet<usize>>;
+
 pub struct Server {
     node_id: String,
     msg_id: usize,
-    messages_seen: Option<HashSet<usize>>,
-    neighbours: Option<HashSet<String>>,
+    messages_seen: MessageSeen,
+    messages_seen_by_neighbours: Option<HashMap<String, MessageSeen>>,
 }
 
 impl Server {
@@ -21,7 +23,7 @@ impl Server {
             node_id: node_id.into(),
             msg_id: 0,
             messages_seen: None,
-            neighbours: None,
+            messages_seen_by_neighbours: None,
         }
     }
 
@@ -72,8 +74,11 @@ impl Server {
             }
             RequestPayload::Topology { topology } => {
                 if let Some(neighbours) = topology.get(&self.node_id) {
-                    let neighbours = neighbours.clone();
-                    self.neighbours = Some(neighbours);
+                    let messages_seen_by_neighbours: HashMap<String, MessageSeen> = neighbours
+                        .iter()
+                        .map(|neighbour| (neighbour.clone(), None))
+                        .collect();
+                    self.messages_seen_by_neighbours = Some(messages_seen_by_neighbours);
                 }
                 ResponsePayload::Topology
             }
