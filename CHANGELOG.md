@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0](https://github.com/edpft/gossip-glomers/compare/v0.2.0...v0.3.0) (2023-09-17)
+
+
+### Features
+
+* **broadcast:** add `broadcast_ok`, `read_ok`, and `topology_ok`  to response types ([2743ae5](https://github.com/edpft/gossip-glomers/commit/2743ae5b55d00ca04d3fb1a1d7d4670ad7d6c454))
+* **broadcast:** add `broadcast`, `read`, and `topology`  to request types ([2743ae5](https://github.com/edpft/gossip-glomers/commit/2743ae5b55d00ca04d3fb1a1d7d4670ad7d6c454))
+* **broadcast:** handle `broadcast`, `read`, and `topology` request types ([2743ae5](https://github.com/edpft/gossip-glomers/commit/2743ae5b55d00ca04d3fb1a1d7d4670ad7d6c454))
+* **broadcast:** Implement a single-node broadcast system ([#8](https://github.com/edpft/gossip-glomers/issues/8)) ([2743ae5](https://github.com/edpft/gossip-glomers/commit/2743ae5b55d00ca04d3fb1a1d7d4670ad7d6c454))
+
 ## [0.2.0](https://github.com/edpft/gossip-glomers/compare/0.1.0...v0.2.0) (2023-09-16)
 
 
