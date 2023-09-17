@@ -42,4 +42,6 @@ pub enum ResponseBody {
     },
     #[serde(rename = "generate_ok")]
     Generate { in_reply_to: usize, id: Uuid },
+    #[serde(rename = "broadcast_ok")]
+    Broadcast { msg_id: usize, in_reply_to: usize },
 }
