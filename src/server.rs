@@ -12,6 +12,7 @@ pub struct Server {
     node_id: String,
     msg_id: usize,
     messages_seen: Option<HashSet<usize>>,
+    neighbours: Option<HashSet<String>>,
 }
 
 impl Server {
@@ -20,6 +21,7 @@ impl Server {
             node_id: node_id.into(),
             msg_id: 0,
             messages_seen: None,
+            neighbours: None,
         }
     }
 
@@ -68,7 +70,13 @@ impl Server {
                 let messages = self.messages_seen.clone();
                 ResponsePayload::Read { messages }
             }
-            RequestPayload::Topology { .. } => ResponsePayload::Topology,
+            RequestPayload::Topology { topology } => {
+                if let Some(neighbours) = topology.get(&self.node_id) {
+                    let neighbours = neighbours.clone();
+                    self.neighbours = Some(neighbours);
+                }
+                ResponsePayload::Topology
+            }
         };
         let response_body = ResponseBody::new(self.msg_id, request.body.msg_id, response_payload);
         let response = Response::new(&self.node_id, request.src, response_body);
