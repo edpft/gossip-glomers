@@ -37,6 +37,9 @@ pub enum RequestBody {
         message: usize,
         msg_id: usize,
     },
+    Read {
+        msg_id: usize,
+    },
 }
 
 impl RequestBody {
@@ -46,6 +49,7 @@ impl RequestBody {
             RequestBody::Init { .. } => "init",
             RequestBody::Generate { .. } => "generate",
             RequestBody::Broadcast { .. } => "broadcast",
+            RequestBody::Read { .. } => "read",
         };
         str.to_string()
     }
