@@ -86,6 +86,14 @@ impl Server {
                     in_reply_to: msg_id,
                 }
             }
+            RequestBody::Read { msg_id } => {
+                let messages = self.messages_seen.clone();
+                ResponseBody::Read {
+                    msg_id: self.msg_id,
+                    in_reply_to: msg_id,
+                    messages,
+                }
+            }
         };
         let response = Response::new(&self.node_id, request.src, response_body);
         self.msg_id += 1;
