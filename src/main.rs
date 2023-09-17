@@ -3,31 +3,30 @@ mod request;
 mod response;
 mod server;
 
-use std::io::{stdin, stdout, BufRead, Write};
+use std::{
+    convert::TryFrom,
+    io::{stdin, stdout, Write},
+};
 
-use error::Error;
 use request::Request;
+use serde_json::Deserializer;
 use server::Server;
 
 fn main() -> color_eyre::Result<()> {
     let stdin_lock = stdin().lock();
     let mut stdout_lock = stdout().lock();
 
-    let mut lines = stdin_lock.lines().flatten();
+    let mut requests = Deserializer::from_reader(stdin_lock).into_iter::<Request>();
 
-    let mut server = if let Some(initial_request_string) = lines.next() {
-        let initial_request = Request::from_string(initial_request_string)?;
-        let mut server = Server::from_initial_request(&initial_request)?;
-        let initial_response = server.handle_initial_request(initial_request)?;
-        writeln!(stdout_lock, "{}", initial_response)?;
-        Ok(server)
-    } else {
-        let error = Error::Initialisation;
-        Err(error)
-    }?;
+    let initial_request = requests
+        .next()
+        .expect("Received init message")
+        .expect("Deserialized request from init message");
+    let mut server = Server::try_from(&initial_request)?;
+    let initial_response = server.handle_initial_request(initial_request)?;
+    writeln!(stdout_lock, "{}", initial_response)?;
 
-    for line in lines {
-        let request = Request::from_string(line)?;
+    for request in requests.flatten() {
         let response = server.handle_request(request)?;
         writeln!(stdout_lock, "{}", response)?;
     }

@@ -29,27 +29,41 @@ impl fmt::Display for Response {
 }
 
 #[derive(Debug, Serialize, PartialEq, Eq)]
+pub struct ResponseBody {
+    pub msg_id: Option<usize>,
+    pub in_reply_to: Option<usize>,
+    #[serde(flatten)]
+    pub payload: ResponsePayload,
+}
+
+impl ResponseBody {
+    pub fn new(
+        msg_id: impl Into<Option<usize>>,
+        in_reply_to: impl Into<Option<usize>>,
+        payload: ResponsePayload,
+    ) -> Self {
+        Self {
+            msg_id: msg_id.into(),
+            in_reply_to: in_reply_to.into(),
+            payload,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, PartialEq, Eq)]
 #[serde(tag = "type")]
-pub enum ResponseBody {
+pub enum ResponsePayload {
     // clippy doesn't like the repeated postfixes
     #[serde(rename = "init_ok")]
-    Init { in_reply_to: usize },
+    Init,
     #[serde(rename = "echo_ok")]
-    Echo {
-        msg_id: usize,
-        in_reply_to: usize,
-        echo: String,
-    },
+    Echo { echo: String },
     #[serde(rename = "generate_ok")]
-    Generate { in_reply_to: usize, id: Uuid },
+    Generate { id: Uuid },
     #[serde(rename = "broadcast_ok")]
-    Broadcast { msg_id: usize, in_reply_to: usize },
+    Broadcast,
     #[serde(rename = "read_ok")]
-    Read {
-        msg_id: usize,
-        in_reply_to: usize,
-        messages: Option<HashSet<usize>>,
-    },
+    Read { messages: Option<HashSet<usize>> },
     #[serde(rename = "topology_ok")]
-    Topology { msg_id: usize, in_reply_to: usize },
+    Topology,
 }

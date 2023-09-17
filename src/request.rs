@@ -9,37 +9,30 @@ pub struct Request {
     pub body: RequestBody,
 }
 
-impl Request {
-    pub fn from_string(string: String) -> color_eyre::Result<Self> {
-        let request: Self = serde_json::from_str(&string)?;
-        Ok(request)
-    }
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+pub struct RequestBody {
+    pub msg_id: Option<usize>,
+    pub in_reply_to: Option<usize>,
+    #[serde(flatten)]
+    pub payload: RequestPayload,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case", tag = "type")]
-pub enum RequestBody {
+pub enum RequestPayload {
     Init {
-        msg_id: usize,
         node_id: String,
         node_ids: HashSet<String>,
     },
     Echo {
-        msg_id: usize,
         echo: String,
     },
-    Generate {
-        msg_id: usize,
-    },
+    Generate,
     Broadcast {
-        msg_id: usize,
         message: usize,
     },
-    Read {
-        msg_id: usize,
-    },
+    Read,
     Topology {
-        msg_id: usize,
         topology: HashMap<String, HashSet<String>>,
     },
 }
