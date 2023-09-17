@@ -50,4 +50,6 @@ pub enum ResponseBody {
         in_reply_to: usize,
         messages: Vec<usize>,
     },
+    #[serde(rename = "topology_ok")]
+    Topology { msg_id: usize, in_reply_to: usize },
 }
