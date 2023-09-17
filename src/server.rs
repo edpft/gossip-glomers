@@ -94,6 +94,13 @@ impl Server {
                     messages,
                 }
             }
+            RequestBody::Topology {
+                msg_id,
+                topology: _,
+            } => ResponseBody::Topology {
+                msg_id: self.msg_id,
+                in_reply_to: msg_id,
+            },
         };
         let response = Response::new(&self.node_id, request.src, response_body);
         self.msg_id += 1;
