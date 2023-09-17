@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use serde::Deserialize;
 
@@ -22,7 +22,7 @@ pub enum RequestBody {
     Init {
         msg_id: usize,
         node_id: String,
-        node_ids: Vec<String>,
+        node_ids: HashSet<String>,
     },
     Echo {
         msg_id: usize,
@@ -40,6 +40,6 @@ pub enum RequestBody {
     },
     Topology {
         msg_id: usize,
-        topology: HashMap<String, Vec<String>>,
+        topology: HashMap<String, HashSet<String>>,
     },
 }
