@@ -1,8 +1,8 @@
-use std::io;
+use std::{collections::HashMap, io};
 
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct Request {
     pub src: String,
     pub dest: String,
@@ -18,7 +18,7 @@ impl Request {
     }
 }
 
-#[derive(Debug, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case", tag = "type")]
 pub enum RequestBody {
     Init {
@@ -33,6 +33,17 @@ pub enum RequestBody {
     Generate {
         msg_id: usize,
     },
+    Broadcast {
+        msg_id: usize,
+        message: usize,
+    },
+    Read {
+        msg_id: usize,
+    },
+    Topology {
+        msg_id: usize,
+        topology: HashMap<String, Vec<String>>,
+    },
 }
 
 impl RequestBody {
@@ -41,6 +52,9 @@ impl RequestBody {
             RequestBody::Echo { .. } => "echo",
             RequestBody::Init { .. } => "init",
             RequestBody::Generate { .. } => "generate",
+            RequestBody::Broadcast { .. } => "broadcast",
+            RequestBody::Read { .. } => "read",
+            RequestBody::Topology { .. } => "topology",
         };
         str.to_string()
     }

@@ -42,4 +42,14 @@ pub enum ResponseBody {
     },
     #[serde(rename = "generate_ok")]
     Generate { in_reply_to: usize, id: Uuid },
+    #[serde(rename = "broadcast_ok")]
+    Broadcast { msg_id: usize, in_reply_to: usize },
+    #[serde(rename = "read_ok")]
+    Read {
+        msg_id: usize,
+        in_reply_to: usize,
+        messages: Vec<usize>,
+    },
+    #[serde(rename = "topology_ok")]
+    Topology { msg_id: usize, in_reply_to: usize },
 }

@@ -45,3 +45,25 @@ fn test_handle_generate() -> color_eyre::Result<()> {
     assert!(status.success());
     Ok(())
 }
+
+#[test]
+fn test_handle_single_node_broadcast() -> color_eyre::Result<()> {
+    let status = Command::new("./maelstrom/maelstrom")
+        .args([
+            "test",
+            "-w",
+            "broadcast",
+            "--bin",
+            "./target/debug/gossip-glomers",
+            "--node-count",
+            "1",
+            "--time-limit",
+            "20",
+            "--rate",
+            "10",
+        ])
+        .status()
+        .expect("failed to execute process");
+    assert!(status.success());
+    Ok(())
+}

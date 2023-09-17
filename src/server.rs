@@ -9,6 +9,7 @@ use crate::{
 pub struct Server {
     node_id: String,
     msg_id: usize,
+    messages_seen: Vec<usize>,
 }
 
 impl Server {
@@ -16,6 +17,7 @@ impl Server {
         Self {
             node_id: node_id.into(),
             msg_id: 0,
+            messages_seen: Vec::new(),
         }
     }
 
@@ -77,6 +79,28 @@ impl Server {
                     id,
                 }
             }
+            RequestBody::Broadcast { message, msg_id } => {
+                self.messages_seen.push(message);
+                ResponseBody::Broadcast {
+                    msg_id: self.msg_id,
+                    in_reply_to: msg_id,
+                }
+            }
+            RequestBody::Read { msg_id } => {
+                let messages = self.messages_seen.clone();
+                ResponseBody::Read {
+                    msg_id: self.msg_id,
+                    in_reply_to: msg_id,
+                    messages,
+                }
+            }
+            RequestBody::Topology {
+                msg_id,
+                topology: _,
+            } => ResponseBody::Topology {
+                msg_id: self.msg_id,
+                in_reply_to: msg_id,
+            },
         };
         let response = Response::new(&self.node_id, request.src, response_body);
         self.msg_id += 1;
