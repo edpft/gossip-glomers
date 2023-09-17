@@ -31,9 +31,8 @@ impl Server {
                 let server = Server::new(node_id);
                 Ok(server)
             }
-            request_body => {
-                let request_kind = request_body.kind();
-                let error = Error::Initialisation(request_kind);
+            _ => {
+                let error = Error::Initialisation;
                 Err(error)?
             }
         }
@@ -53,9 +52,8 @@ impl Server {
                 self.msg_id += 1;
                 Ok(response)
             }
-            request_body => {
-                let request_kind = request_body.kind();
-                let error = Error::Initialisation(request_kind);
+            _ => {
+                let error = Error::Initialisation;
                 Err(error)?
             }
         }
