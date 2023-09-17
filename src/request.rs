@@ -1,4 +1,4 @@
-use std::{collections::HashMap, io};
+use std::collections::HashMap;
 
 use serde::Deserialize;
 
@@ -10,10 +10,8 @@ pub struct Request {
 }
 
 impl Request {
-    pub fn from_stdin() -> color_eyre::Result<Self> {
-        let mut buffer = String::new();
-        io::stdin().read_line(&mut buffer)?;
-        let request: Self = serde_json::from_str(&buffer)?;
+    pub fn from_string(string: String) -> color_eyre::Result<Self> {
+        let request: Self = serde_json::from_str(&string)?;
         Ok(request)
     }
 }
