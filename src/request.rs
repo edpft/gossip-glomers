@@ -1,4 +1,4 @@
-use std::{collections::HashMap, io};
+use std::collections::{HashMap, HashSet};
 
 use serde::Deserialize;
 
@@ -10,10 +10,8 @@ pub struct Request {
 }
 
 impl Request {
-    pub fn from_stdin() -> color_eyre::Result<Self> {
-        let mut buffer = String::new();
-        io::stdin().read_line(&mut buffer)?;
-        let request: Self = serde_json::from_str(&buffer)?;
+    pub fn from_string(string: String) -> color_eyre::Result<Self> {
+        let request: Self = serde_json::from_str(&string)?;
         Ok(request)
     }
 }
@@ -24,7 +22,7 @@ pub enum RequestBody {
     Init {
         msg_id: usize,
         node_id: String,
-        node_ids: Vec<String>,
+        node_ids: HashSet<String>,
     },
     Echo {
         msg_id: usize,
@@ -42,20 +40,6 @@ pub enum RequestBody {
     },
     Topology {
         msg_id: usize,
-        topology: HashMap<String, Vec<String>>,
+        topology: HashMap<String, HashSet<String>>,
     },
-}
-
-impl RequestBody {
-    pub fn kind(&self) -> String {
-        let str = match self {
-            RequestBody::Echo { .. } => "echo",
-            RequestBody::Init { .. } => "init",
-            RequestBody::Generate { .. } => "generate",
-            RequestBody::Broadcast { .. } => "broadcast",
-            RequestBody::Read { .. } => "read",
-            RequestBody::Topology { .. } => "topology",
-        };
-        str.to_string()
-    }
 }
