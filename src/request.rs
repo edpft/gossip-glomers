@@ -43,17 +43,3 @@ pub enum RequestBody {
         topology: HashMap<String, Vec<String>>,
     },
 }
-
-impl RequestBody {
-    pub fn kind(&self) -> String {
-        let str = match self {
-            RequestBody::Echo { .. } => "echo",
-            RequestBody::Init { .. } => "init",
-            RequestBody::Generate { .. } => "generate",
-            RequestBody::Broadcast { .. } => "broadcast",
-            RequestBody::Read { .. } => "read",
-            RequestBody::Topology { .. } => "topology",
-        };
-        str.to_string()
-    }
-}
