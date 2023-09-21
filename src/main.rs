@@ -2,12 +2,7 @@ mod error;
 mod message;
 mod server;
 
-use std::{
-    convert::TryFrom,
-    io,
-    sync::mpsc::{self, Receiver},
-    thread,
-};
+use std::{convert::TryFrom, io};
 
 use serde_json::Deserializer;
 use server::Server;
