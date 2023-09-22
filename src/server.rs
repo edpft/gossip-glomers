@@ -45,21 +45,36 @@ impl Server {
         }
     }
 
-    pub fn handle_request(&mut self, request: Message) -> Option<Message> {
+    pub fn handle_request(&mut self, request: Message) -> Result<Option<Message>, Error> {
         let response_payload = match request.body.payload {
-            Payload::Init { .. } => None,
-            Payload::InitOk => None,
+            Payload::Init { .. } => {
+                let error = Error::AlreadyInitialised;
+                Err(error)
+            }
+            Payload::InitOk => {
+                let message = "init_ok".to_string();
+                let error = Error::InvalidRequest(message);
+                Err(error)
+            }
             Payload::Echo { echo } => {
                 let payload = Payload::EchoOk { echo };
-                Some(payload)
+                Ok(Some(payload))
             }
-            Payload::EchoOk { .. } => None,
+            Payload::EchoOk { .. } => {
+                let message = "echo_ok".to_string();
+                let error = Error::InvalidRequest(message);
+                Err(error)
+            }
             Payload::Generate => {
                 let id = Uuid::new_v4();
                 let payload = Payload::GenerateOk { id };
-                Some(payload)
+                Ok(Some(payload))
             }
-            Payload::GenerateOk { .. } => None,
+            Payload::GenerateOk { .. } => {
+                let message = "generate_ok".to_string();
+                let error = Error::InvalidRequest(message);
+                Err(error)
+            }
             Payload::Broadcast { message } => {
                 if self.ids_seen.is_none() {
                     let ids_seen = HashSet::new();
@@ -69,15 +84,23 @@ impl Server {
                     .as_mut()
                     .map(|ids_seen| ids_seen.insert(message));
                 let payload = Payload::BroadcastOk;
-                Some(payload)
+                Ok(Some(payload))
             }
-            Payload::BroadcastOk => None,
+            Payload::BroadcastOk => {
+                let message = "broadcast_ok".to_string();
+                let error = Error::InvalidRequest(message);
+                Err(error)
+            }
             Payload::Read => {
                 let messages = self.ids_seen.clone();
                 let payload = Payload::ReadOk { messages };
-                Some(payload)
+                Ok(Some(payload))
             }
-            Payload::ReadOk { .. } => None,
+            Payload::ReadOk { .. } => {
+                let message = "read_ok".to_string();
+                let error = Error::InvalidRequest(message);
+                Err(error)
+            }
             Payload::Topology { topology } => {
                 if let Some(neighbours) = topology.get(&self.node_id) {
                     let ids_seen_by_neighbours: HashMap<String, MessageSeen> = neighbours
@@ -87,9 +110,13 @@ impl Server {
                     self.ids_seen_by_neighbours = Some(ids_seen_by_neighbours);
                 }
                 let payload = Payload::TopologyOk;
-                Some(payload)
+                Ok(Some(payload))
             }
-            Payload::TopologyOk => None,
+            Payload::TopologyOk => {
+                let message = "topology_ok".to_string();
+                let error = Error::InvalidRequest(message);
+                Err(error)
+            }
             Payload::Gossip { ids_to_see } => {
                 let neighbour = request.src.clone();
                 let ids_seen_by_neighbour = &ids_to_see;
@@ -99,30 +126,33 @@ impl Server {
                 let payload = Payload::GossipOk {
                     ids_seen: ids_to_gossip,
                 };
-                Some(payload)
+                Ok(Some(payload))
             }
             Payload::GossipOk { ids_seen } => {
                 let neighbour = request.src.clone();
                 let ids_seen_by_neighbour = &ids_seen;
                 self.update_ids_seen_by_neighbours(&neighbour, ids_seen_by_neighbour);
-                None
+                Ok(None)
             }
         };
         match response_payload {
-            None => None,
-            Some(response_payload) => match response_payload {
-                Payload::GossipOk { .. } => {
-                    let response_body = Body::new(None, None, response_payload);
-                    let response = Message::new(&self.node_id, request.src, response_body);
-                    Some(response)
-                }
-                _ => {
-                    let response_body =
-                        Body::new(self.msg_id, request.body.msg_id, response_payload);
-                    let response = Message::new(&self.node_id, request.src, response_body);
-                    self.msg_id += 1;
-                    Some(response)
-                }
+            Err(error) => Err(error),
+            Ok(payload) => match payload {
+                None => Ok(None),
+                Some(response_payload) => match response_payload {
+                    Payload::GossipOk { .. } => {
+                        let response_body = Body::new(None, None, response_payload);
+                        let response = Message::new(&self.node_id, request.src, response_body);
+                        Ok(Some(response))
+                    }
+                    _ => {
+                        let response_body =
+                            Body::new(self.msg_id, request.body.msg_id, response_payload);
+                        let response = Message::new(&self.node_id, request.src, response_body);
+                        self.msg_id += 1;
+                        Ok(Some(response))
+                    }
+                },
             },
         }
     }
