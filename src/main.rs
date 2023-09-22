@@ -33,7 +33,7 @@ fn main() -> color_eyre::Result<()> {
     let requests = Deserializer::from_reader(stdin).into_iter::<Message>();
     requests.flatten().enumerate().for_each(|(index, request)| {
         eprintln!("[INFO] - Received request: {}", &request);
-        if let Some(response) = server.handle_request(request) {
+        if let Ok(Some(response)) = server.handle_request(request) {
             println!("{}", &response);
             eprintln!("[INFO] - Sent response: {}", response);
         };
