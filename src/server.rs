@@ -4,20 +4,20 @@ use uuid::Uuid;
 
 use crate::{
     error::Error,
-    message::{Body, Message, Payload},
+    message::{Body, Message, NodeId, Payload},
 };
 
 type MessageSeen = Option<HashSet<usize>>;
 
 pub struct Server {
-    node_id: String,
+    node_id: NodeId,
     msg_id: usize,
     ids_seen: MessageSeen,
-    ids_seen_by_neighbours: Option<HashMap<String, MessageSeen>>,
+    ids_seen_by_neighbours: Option<HashMap<NodeId, MessageSeen>>,
 }
 
 impl Server {
-    fn new(node_id: impl Into<String>) -> Self {
+    fn new(node_id: impl Into<NodeId>) -> Self {
         Self {
             node_id: node_id.into(),
             msg_id: 0,
@@ -34,7 +34,7 @@ impl Server {
             } => {
                 let response_payload = Payload::InitOk;
                 let response_body = Body::new(self.msg_id, request.body.msg_id, response_payload);
-                let response = Message::new(&self.node_id, request.src, response_body);
+                let response = Message::new(self.node_id.clone(), request.src, response_body);
                 self.msg_id += 1;
                 Ok(response)
             }
@@ -103,7 +103,7 @@ impl Server {
             }
             Payload::Topology { topology } => {
                 if let Some(neighbours) = topology.get(&self.node_id) {
-                    let ids_seen_by_neighbours: HashMap<String, MessageSeen> = neighbours
+                    let ids_seen_by_neighbours: HashMap<NodeId, MessageSeen> = neighbours
                         .iter()
                         .map(|neighbour| (neighbour.clone(), None))
                         .collect();
@@ -120,7 +120,7 @@ impl Server {
             Payload::Gossip { ids_to_see } => {
                 let neighbour = request.src.clone();
                 let ids_seen_by_neighbour = &ids_to_see;
-                self.update_ids_seen_by_neighbours(&neighbour, ids_seen_by_neighbour);
+                self.update_ids_seen_by_neighbours(neighbour, ids_seen_by_neighbour);
                 self.update_ids_seen(ids_seen_by_neighbour);
                 let ids_to_gossip = get_ids_to_gossip(&self.ids_seen, ids_seen_by_neighbour);
                 let payload = Payload::GossipOk {
@@ -131,7 +131,7 @@ impl Server {
             Payload::GossipOk { ids_seen } => {
                 let neighbour = request.src.clone();
                 let ids_seen_by_neighbour = &ids_seen;
-                self.update_ids_seen_by_neighbours(&neighbour, ids_seen_by_neighbour);
+                self.update_ids_seen_by_neighbours(neighbour, ids_seen_by_neighbour);
                 Ok(None)
             }
         };
@@ -142,13 +142,15 @@ impl Server {
                 Some(response_payload) => match response_payload {
                     Payload::GossipOk { .. } => {
                         let response_body = Body::new(None, None, response_payload);
-                        let response = Message::new(&self.node_id, request.src, response_body);
+                        let response =
+                            Message::new(self.node_id.clone(), request.src, response_body);
                         Ok(Some(response))
                     }
                     _ => {
                         let response_body =
                             Body::new(self.msg_id, request.body.msg_id, response_payload);
-                        let response = Message::new(&self.node_id, request.src, response_body);
+                        let response =
+                            Message::new(self.node_id.clone(), request.src, response_body);
                         self.msg_id += 1;
                         Ok(Some(response))
                     }
@@ -169,7 +171,7 @@ impl Server {
                             ids_to_see: ids_to_gossip,
                         };
                         let request_body = Body::new(self.msg_id, None, request_payload);
-                        Message::new(&self.node_id, neighbour, request_body)
+                        Message::new(self.node_id.clone(), neighbour.clone(), request_body)
                     })
                     .collect();
                 Some(messages_to_gossip)
@@ -180,7 +182,7 @@ impl Server {
 
     fn update_ids_seen_by_neighbours(
         &mut self,
-        neighbour: &str,
+        neighbour: NodeId,
         ids_seen_by_neighbour: &MessageSeen,
     ) {
         match (self.ids_seen_by_neighbours.as_mut(), ids_seen_by_neighbour) {
@@ -189,20 +191,18 @@ impl Server {
             (None, Some(ids_seen_by_neighbour)) => {
                 let mut ids_seen_by_neighbours = HashMap::new();
                 let ids_seen_by_neighbour = ids_seen_by_neighbour.clone();
-                let neighbour = neighbour.to_string();
                 ids_seen_by_neighbours.insert(neighbour, Some(ids_seen_by_neighbour));
                 self.ids_seen_by_neighbours = Some(ids_seen_by_neighbours);
             }
             (Some(ids_seen_by_neighbours), Some(ids_seen_by_neighbour)) => {
                 if let Some(previous_ids_seen_by_neighbour) =
-                    ids_seen_by_neighbours.get_mut(neighbour)
+                    ids_seen_by_neighbours.get_mut(&neighbour)
                 {
                     match previous_ids_seen_by_neighbour {
                         Some(previous_ids_seen_by_neighbour) => {
                             previous_ids_seen_by_neighbour.extend(ids_seen_by_neighbour)
                         }
                         None => {
-                            let neighbour = neighbour.to_string();
                             let ids_seen_by_neighbour = ids_seen_by_neighbour.clone();
                             ids_seen_by_neighbours.insert(neighbour, Some(ids_seen_by_neighbour));
                         }
@@ -257,7 +257,7 @@ impl TryFrom<&Message> for Server {
                 node_id,
                 node_ids: _,
             } => {
-                let server = Server::new(node_id);
+                let server = Server::new(node_id.clone());
                 Ok(server)
             }
             _ => {

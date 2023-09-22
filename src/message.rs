@@ -8,13 +8,13 @@ use uuid::Uuid;
 
 #[derive(Debug, Deserialize, PartialEq, Eq, Serialize)]
 pub struct Message {
-    pub src: String,
-    pub dest: String,
+    pub src: NodeId,
+    pub dest: NodeId,
     pub body: Body,
 }
 
 impl Message {
-    pub fn new(src: impl Into<String>, dest: impl Into<String>, body: Body) -> Self {
+    pub fn new(src: impl Into<NodeId>, dest: impl Into<NodeId>, body: Body) -> Self {
         Self {
             src: src.into(),
             dest: dest.into(),
@@ -57,8 +57,8 @@ impl Body {
 #[serde(rename_all = "snake_case", tag = "type")]
 pub enum Payload {
     Init {
-        node_id: String,
-        node_ids: HashSet<String>,
+        node_id: NodeId,
+        node_ids: HashSet<NodeId>,
     },
     InitOk,
     Echo {
@@ -80,7 +80,7 @@ pub enum Payload {
         messages: Option<HashSet<usize>>,
     },
     Topology {
-        topology: HashMap<String, HashSet<String>>,
+        topology: HashMap<NodeId, HashSet<NodeId>>,
     },
     TopologyOk,
     Gossip {
@@ -90,3 +90,6 @@ pub enum Payload {
         ids_seen: Option<HashSet<usize>>,
     },
 }
+
+#[derive(Debug, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Clone)]
+pub struct NodeId(Box<str>);
