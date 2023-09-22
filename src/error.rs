@@ -4,4 +4,6 @@ pub enum Error {
     Initialisation,
     #[error("Server already initialised")]
     AlreadyInitialised,
+    #[error("Server should not receive a `{0}` request")]
+    InvalidRequest(String),
 }
