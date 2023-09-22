@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/edpft/gossip-glomers/compare/v0.3.0...v0.4.0) (2023-09-22)
+
+
+### Features
+
+* **broadcast:** Implement multi-node broadcast ([c2a158d](https://github.com/edpft/gossip-glomers/commit/c2a158d3552d84d47987d1283ee56c2f2ffbe21d))
+
 ## [0.3.0](https://github.com/edpft/gossip-glomers/compare/v0.2.0...v0.3.0) (2023-09-17)
 
 
