@@ -6,43 +6,44 @@ use std::{convert::TryFrom, io};
 
 use serde_json::Deserializer;
 use server::Server;
+use tracing::info;
+use tracing_subscriber::filter::LevelFilter;
 
 use crate::message::Message;
 
 fn main() -> color_eyre::Result<()> {
+    initialise_tracing();
+
     let stdin = io::stdin();
-    eprintln!("[INFO] - Got stdin");
+    info!("Got stdin");
 
     let mut buf = String::new();
     stdin.read_line(&mut buf)?;
 
     let initial_request: Message = serde_json::from_str(&buf)?;
-    eprintln!(
-        "[INFO] - Received initialisation request: {}",
-        &initial_request
-    );
+    info!(target: "Received request", request = ?initial_request);
 
     let mut server = Server::try_from(&initial_request)?;
-    eprintln!("[INFO] - Initialised server");
+    info!("Initialised server");
 
     let initial_response = server.handle_initial_request(initial_request)?;
 
     println!("{}", &initial_response);
-    eprintln!("[INFO] - Sent initialisation response: {initial_response}");
+    info!(target: "Sent response", response = ?initial_response);
 
     let requests = Deserializer::from_reader(stdin).into_iter::<Message>();
     requests.flatten().enumerate().for_each(|(index, request)| {
-        eprintln!("[INFO] - Received request: {}", &request);
+        info!(target: "Received request", request = ?request);
         if let Ok(Some(response)) = server.handle_request(request) {
             println!("{}", &response);
-            eprintln!("[INFO] - Sent response: {}", response);
+            info!(target: "Sent response", response = ?response);
         };
 
         if index % 4 == 0 {
             if let Some(messages) = server.generate_gossip() {
                 messages.iter().for_each(|message| {
                     println!("{}", &message);
-                    eprintln!("[INFO] - Sent request: {}", message);
+                    info!(target: "Sent request", request = ?message);
                 })
             }
         };
@@ -51,8 +52,16 @@ fn main() -> color_eyre::Result<()> {
     if let Some(messages) = server.generate_gossip() {
         messages.iter().for_each(|message| {
             println!("{}", &message);
-            eprintln!("[INFO] - Sent request: {}", message);
+            info!(target: "Sent request", request = ?message);
         })
     }
     Ok(())
+}
+
+fn initialise_tracing() {
+    tracing_subscriber::fmt()
+        .with_max_level(LevelFilter::INFO)
+        .with_writer(io::stderr)
+        .with_ansi(false)
+        .init();
 }
