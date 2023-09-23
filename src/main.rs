@@ -62,5 +62,6 @@ fn initialise_tracing() {
     tracing_subscriber::fmt()
         .with_max_level(LevelFilter::INFO)
         .with_writer(io::stderr)
+        .with_ansi(false)
         .init();
 }
