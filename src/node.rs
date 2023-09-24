@@ -211,14 +211,19 @@ impl Node {
                     node
                 }
                 Payload::Gossip { ids_to_see } => {
-                    ids_seen_by_neighbours.update(request.src, ids_to_see.clone());
-                    Node::NetworkedBroadcasting {
+                    ids_seen_by_neighbours.update(request.src.clone(), ids_to_see.clone());
+                    let node = Node::NetworkedBroadcasting {
                         msg_id,
                         node_id: node_id.clone(),
                         node_ids,
-                        ids_seen: ids_to_see,
+                        ids_seen: ids_to_see.clone(),
                         ids_seen_by_neighbours,
-                    }
+                    };
+                    let payload = Payload::GossipOk { ids_to_see };
+                    let response =
+                        Message::new(node_id, request.src, msg_id, request.body.msg_id, payload);
+                    response.send();
+                    node
                 }
 
                 payload => {
