@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/edpft/gossip-glomers/compare/v0.4.0...v0.5.0) (2023-09-24)
+
+
+### Features
+
+* **broadcast:** Implement fault tolerant broadcast ([#17](https://github.com/edpft/gossip-glomers/issues/17)) ([7e60491](https://github.com/edpft/gossip-glomers/commit/7e60491d900a7c3f4b71cab62a0e03c488fd2d2b))
+
 ## [0.4.0](https://github.com/edpft/gossip-glomers/compare/v0.3.0...v0.4.0) (2023-09-22)
 
 
