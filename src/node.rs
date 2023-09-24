@@ -322,10 +322,12 @@ impl Node {
                         .difference(ids_seen_by_neighbour)
                         .copied()
                         .collect();
+                    if !ids_to_see.is_empty() {
                     let payload = Payload::Gossip { ids_to_see };
                     let request =
                         Message::new(node_id.clone(), neighbour.clone(), None, None, payload);
                     request.send();
+                    }
                 })
         }
     }
