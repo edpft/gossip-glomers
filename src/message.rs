@@ -4,6 +4,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
+use tracing::info;
 use uuid::Uuid;
 
 #[derive(Debug, Deserialize, PartialEq, Eq, Serialize)]
@@ -14,12 +15,24 @@ pub struct Message {
 }
 
 impl Message {
-    pub fn new(src: impl Into<NodeId>, dest: impl Into<NodeId>, body: Body) -> Self {
+    pub fn new(
+        src: impl Into<NodeId>,
+        dest: impl Into<NodeId>,
+        msg_id: impl Into<Option<usize>>,
+        in_reply_to: impl Into<Option<usize>>,
+        payload: Payload,
+    ) -> Self {
+        let body = Body::new(msg_id, in_reply_to, payload);
         Self {
             src: src.into(),
             dest: dest.into(),
             body,
         }
+    }
+
+    pub fn send(self) {
+        println!("{}", &self);
+        info!(target: "Sent message", message = ?self);
     }
 }
 
@@ -77,17 +90,17 @@ pub enum Payload {
     BroadcastOk,
     Read,
     ReadOk {
-        messages: Option<HashSet<usize>>,
+        messages: HashSet<usize>,
     },
     Topology {
         topology: HashMap<NodeId, HashSet<NodeId>>,
     },
     TopologyOk,
     Gossip {
-        ids_to_see: Option<HashSet<usize>>,
+        ids_to_see: HashSet<usize>,
     },
     GossipOk {
-        ids_seen: Option<HashSet<usize>>,
+        ids_to_see: HashSet<usize>,
     },
 }
 
