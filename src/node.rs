@@ -147,7 +147,7 @@ impl Node {
                         ids_seen.difference(&ids_to_see).copied().collect();
                     ids_seen.extend(ids_not_seen_by_self);
                     let node = Node::Broadcasting {
-                        msg_id: msg_id + 1,
+                        msg_id,
                         node_id: node_id.clone(),
                         node_ids,
                         ids_seen,
@@ -158,13 +158,7 @@ impl Node {
                         let payload = Payload::GossipOk {
                             ids_to_see: ids_not_seen_by_other,
                         };
-                        let response = Message::new(
-                            node_id,
-                            request.src,
-                            msg_id,
-                            request.body.msg_id,
-                            payload,
-                        );
+                        let response = Message::new(node_id, request.src, None, None, payload);
                         response.send();
                         node
                     }
@@ -269,7 +263,7 @@ impl Node {
                         ids_seen.difference(&ids_to_see).copied().collect();
                     ids_seen.extend(ids_not_seen_by_self);
                     let node = Node::NetworkedBroadcasting {
-                        msg_id: msg_id + 1,
+                        msg_id,
                         node_id: node_id.clone(),
                         node_ids,
                         ids_seen,
@@ -281,13 +275,7 @@ impl Node {
                         let payload = Payload::GossipOk {
                             ids_to_see: ids_not_seen_by_other,
                         };
-                        let response = Message::new(
-                            node_id,
-                            request.src,
-                            msg_id,
-                            request.body.msg_id,
-                            payload,
-                        );
+                        let response = Message::new(node_id, request.src, None, None, payload);
                         response.send();
                         node
                     }
