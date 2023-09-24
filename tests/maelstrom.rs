@@ -113,3 +113,27 @@ fn test_handle_fault_tolerant_broadcast() -> color_eyre::Result<()> {
     assert!(status.success());
     Ok(())
 }
+
+#[test]
+fn test_broadcast_efficiency_1() -> color_eyre::Result<()> {
+    let status = Command::new("./maelstrom/maelstrom")
+        .args([
+            "test",
+            "-w",
+            "broadcast",
+            "--bin",
+            "./target/debug/gossip-glomers",
+            "--node-count",
+            "25",
+            "--time-limit",
+            "20",
+            "--rate",
+            "100",
+            "--latency",
+            "100",
+        ])
+        .status()
+        .expect("failed to execute process");
+    assert!(status.success());
+    Ok(())
+}
