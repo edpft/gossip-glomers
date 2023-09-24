@@ -201,10 +201,10 @@ impl Node {
                         msg_id: msg_id + 1,
                         node_id: node_id.clone(),
                         node_ids,
-                        ids_seen,
+                        ids_seen: ids_seen.clone(),
                         ids_seen_by_neighbours,
                     };
-                    let payload = Payload::BroadcastOk;
+                    let payload = Payload::ReadOk { messages: ids_seen };
                     let response =
                         Message::new(node_id, request.src, msg_id, request.body.msg_id, payload);
                     response.send();
