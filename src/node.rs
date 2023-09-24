@@ -177,7 +177,7 @@ impl Node {
                 msg_id,
                 node_id,
                 node_ids,
-                ids_seen_by_neighbours,
+                mut ids_seen_by_neighbours,
             } => match request.body.payload {
                 Payload::Broadcast { message } => {
                     let mut ids_seen = HashSet::new();
@@ -210,6 +210,17 @@ impl Node {
                     response.send();
                     node
                 }
+                Payload::Gossip { ids_to_see } => {
+                    ids_seen_by_neighbours.update(request.src, ids_to_see.clone());
+                    Node::NetworkedBroadcasting {
+                        msg_id,
+                        node_id: node_id.clone(),
+                        node_ids,
+                        ids_seen: ids_to_see,
+                        ids_seen_by_neighbours,
+                    }
+                }
+
                 payload => {
                     error!(target: "invalid payload", node_type="Networked", payload = ?payload);
                     Node::Networked {
@@ -323,10 +334,10 @@ impl Node {
                         .copied()
                         .collect();
                     if !ids_to_see.is_empty() {
-                    let payload = Payload::Gossip { ids_to_see };
-                    let request =
-                        Message::new(node_id.clone(), neighbour.clone(), None, None, payload);
-                    request.send();
+                        let payload = Payload::Gossip { ids_to_see };
+                        let request =
+                            Message::new(node_id.clone(), neighbour.clone(), None, None, payload);
+                        request.send();
                     }
                 })
         }
