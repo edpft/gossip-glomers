@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/edpft/gossip-glomers/compare/v0.5.0...v0.5.1) (2023-09-24)
+
+
+### Bug Fixes
+
+* **broadcast:** correct networked node's read response ([#19](https://github.com/edpft/gossip-glomers/issues/19)) ([f87a932](https://github.com/edpft/gossip-glomers/commit/f87a9323de3c3e08a0494a3bc49cd4cba2f18d7f))
+
 ## [0.5.0](https://github.com/edpft/gossip-glomers/compare/v0.4.0...v0.5.0) (2023-09-24)
 
 
