@@ -293,9 +293,10 @@ impl Node {
                     }
                 }
                 Payload::GossipOk { ids_to_see } => {
+                    ids_seen.extend(ids_to_see.clone());
                     ids_seen_by_neighbours.update(request.src, ids_to_see);
                     Node::NetworkedBroadcasting {
-                        msg_id: msg_id + 1,
+                        msg_id,
                         node_id: node_id.clone(),
                         node_ids,
                         ids_seen,
