@@ -112,7 +112,7 @@ impl NodeId {
         Self(id.into())
     }
 
-    pub fn index(&self) -> usize {
+    pub fn id_number(&self) -> usize {
         self.0
             .chars()
             .nth(1)

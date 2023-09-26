@@ -301,7 +301,7 @@ impl Node {
                     }
                 }
                 Payload::GossipOk { ids_to_see } => {
-                    let index = node_id.index();
+                    let index = node_id.id_number();
                     let duration = Duration::from_millis(index as u64);
                     thread::sleep(duration);
                     ids_seen.extend(ids_to_see.clone());
@@ -337,7 +337,7 @@ impl Node {
             ids_seen_by_neighbours,
         } = self
         {
-            if node_id.index() != 0 {
+            if node_id.id_number() != 0 {
             } else {
                 ids_seen_by_neighbours
                     .0
@@ -428,7 +428,7 @@ fn handle_topology_request(
     dest: NodeId,
     in_reply_to: impl Into<Option<usize>>,
 ) -> Node {
-    let index = node_id.index();
+    let index = node_id.id_number();
     let neighbours = if index == 0 {
         node_ids.clone()
     } else {
