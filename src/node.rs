@@ -1,4 +1,8 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    thread,
+    time::Duration,
+};
 
 use tracing::{error, info};
 use uuid::Uuid;
@@ -297,6 +301,9 @@ impl Node {
                     }
                 }
                 Payload::GossipOk { ids_to_see } => {
+                    let index = node_id.index();
+                    let duration = Duration::from_millis(index as u64);
+                    thread::sleep(duration);
                     ids_seen.extend(ids_to_see.clone());
                     ids_seen_by_neighbours.update(request.src, ids_to_see);
                     Node::NetworkedBroadcasting {
@@ -330,21 +337,29 @@ impl Node {
             ids_seen_by_neighbours,
         } = self
         {
-            ids_seen_by_neighbours
-                .0
-                .iter()
-                .for_each(|(neighbour, ids_seen_by_neighbour)| {
-                    let ids_to_see: HashSet<usize> = ids_seen
-                        .difference(ids_seen_by_neighbour)
-                        .copied()
-                        .collect();
-                    if !ids_to_see.is_empty() {
-                        let payload = Payload::Gossip { ids_to_see };
-                        let request =
-                            Message::new(node_id.clone(), neighbour.clone(), None, None, payload);
-                        request.send();
-                    }
-                })
+            if node_id.index() != 0 {
+            } else {
+                ids_seen_by_neighbours
+                    .0
+                    .iter()
+                    .for_each(|(neighbour, ids_seen_by_neighbour)| {
+                        let ids_to_see: HashSet<usize> = ids_seen
+                            .difference(ids_seen_by_neighbour)
+                            .copied()
+                            .collect();
+                        if !ids_to_see.is_empty() {
+                            let payload = Payload::Gossip { ids_to_see };
+                            let request = Message::new(
+                                node_id.clone(),
+                                neighbour.clone(),
+                                None,
+                                None,
+                                payload,
+                            );
+                            request.send();
+                        }
+                    })
+            }
         }
     }
 }
@@ -414,19 +429,14 @@ fn handle_topology_request(
     in_reply_to: impl Into<Option<usize>>,
 ) -> Node {
     let index = node_id.index();
-    // ! This assumes that there will be 25 nodes
-    let neighbours: HashSet<NodeId> = [
-        (index + 20) % 25,
-        (index + 1) % 5,
-        (index + 5) % 25,
-        (index + 4) % 5,
-    ]
-    .map(|index| {
-        let id = format!("n{}", index);
-        NodeId::new(id)
-    })
-    .into_iter()
-    .collect();
+    let neighbours = if index == 0 {
+        node_ids.clone()
+    } else {
+        let node = NodeId::new("n0");
+        let mut neighbours = HashSet::new();
+        neighbours.insert(node);
+        neighbours
+    };
     let ids_seen_by_neighbours = IdsSeenByNeighbours::new(neighbours);
     let node = Node::Networked {
         msg_id: msg_id + 1,
