@@ -1,7 +1,7 @@
 use std::process::Command;
 
 #[test]
-fn test_handle_echo() -> color_eyre::Result<()> {
+fn test_echo() -> color_eyre::Result<()> {
     let status = Command::new("./maelstrom/maelstrom")
         .args([
             "test",
@@ -21,7 +21,7 @@ fn test_handle_echo() -> color_eyre::Result<()> {
 }
 
 #[test]
-fn test_handle_generate() -> color_eyre::Result<()> {
+fn test_generate() -> color_eyre::Result<()> {
     let status = Command::new("./maelstrom/maelstrom")
         .args([
             "test",
@@ -47,7 +47,7 @@ fn test_handle_generate() -> color_eyre::Result<()> {
 }
 
 #[test]
-fn test_handle_single_node_broadcast() -> color_eyre::Result<()> {
+fn test_single_node_broadcast() -> color_eyre::Result<()> {
     let status = Command::new("./maelstrom/maelstrom")
         .args([
             "test",
@@ -69,7 +69,7 @@ fn test_handle_single_node_broadcast() -> color_eyre::Result<()> {
 }
 
 #[test]
-fn test_handle_multi_node_broadcast() -> color_eyre::Result<()> {
+fn test_multi_node_broadcast() -> color_eyre::Result<()> {
     let status = Command::new("./maelstrom/maelstrom")
         .args([
             "test",
@@ -91,7 +91,7 @@ fn test_handle_multi_node_broadcast() -> color_eyre::Result<()> {
 }
 
 #[test]
-fn test_handle_fault_tolerant_broadcast() -> color_eyre::Result<()> {
+fn test_fault_tolerant_broadcast() -> color_eyre::Result<()> {
     let status = Command::new("./maelstrom/maelstrom")
         .args([
             "test",
