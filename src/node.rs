@@ -409,26 +409,30 @@ fn handle_topology_request(
     msg_id: usize,
     node_id: NodeId,
     node_ids: HashSet<NodeId>,
-    topology: HashMap<NodeId, HashSet<NodeId>>,
+    _: HashMap<NodeId, HashSet<NodeId>>,
     dest: NodeId,
     in_reply_to: impl Into<Option<usize>>,
 ) -> Node {
-    let node = match topology.get(&node_id) {
-        Some(neighbours) => {
-            let neighbours = neighbours.clone();
-            let ids_seen_by_neighbours = IdsSeenByNeighbours::new(neighbours);
-            Node::Networked {
-                msg_id: msg_id + 1,
-                node_id: node_id.clone(),
-                node_ids,
-                ids_seen_by_neighbours,
-            }
-        }
-        None => Node::Initialised {
-            msg_id: msg_id + 1,
-            node_id: node_id.clone(),
-            node_ids,
-        },
+    let index = node_id.index();
+    // ! This assumes that there will be 25 nodes
+    let neighbours: HashSet<NodeId> = [
+        (index + 20) % 25,
+        (index + 1) % 5,
+        (index + 5) % 25,
+        (index + 4) % 5,
+    ]
+    .map(|index| {
+        let id = format!("n{}", index);
+        NodeId::new(id)
+    })
+    .into_iter()
+    .collect();
+    let ids_seen_by_neighbours = IdsSeenByNeighbours::new(neighbours);
+    let node = Node::Networked {
+        msg_id: msg_id + 1,
+        node_id: node_id.clone(),
+        node_ids,
+        ids_seen_by_neighbours,
     };
     let response_payload = Payload::TopologyOk;
     let response = Message::new(node_id, dest, msg_id, in_reply_to, response_payload);

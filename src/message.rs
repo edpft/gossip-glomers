@@ -106,3 +106,18 @@ pub enum Payload {
 
 #[derive(Debug, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Clone)]
 pub struct NodeId(Box<str>);
+
+impl NodeId {
+    pub fn new(id: impl Into<Box<str>>) -> Self {
+        Self(id.into())
+    }
+
+    pub fn index(&self) -> usize {
+        self.0
+            .chars()
+            .nth(1)
+            .expect("There will always be 2 characters")
+            .to_digit(10)
+            .expect("The second character will always be a digit") as usize
+    }
+}
