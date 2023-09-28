@@ -278,7 +278,7 @@ impl Node {
                 }
                 Payload::Gossip { ids_to_see } => {
                     let id_number = node_id.id_number();
-                    let duration = Duration::from_millis(id_number as u64);
+                    let duration = Duration::from_micros(id_number as u64);
                     thread::sleep(duration);
                     let ids_not_seen_by_self: HashSet<usize> =
                         ids_to_see.difference(&ids_seen).copied().collect();
@@ -338,7 +338,7 @@ impl Node {
         } = self
         {
             let id_number = node_id.id_number();
-            let duration = Duration::from_millis(id_number as u64);
+            let duration = Duration::from_micros(id_number as u64);
             thread::sleep(duration);
             ids_seen_by_neighbours
                 .0
