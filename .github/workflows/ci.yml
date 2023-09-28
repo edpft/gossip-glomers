@@ -11,10 +11,13 @@ jobs:
     test:
         name: Test
         runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            test: ["echo", "generate", "single_node_broadcast", "multi_node_broadcast", "fault_tolerant_broadcast", "broadcast_efficiency_1"]
         steps:
             - name: Checkout repo
               uses: actions/checkout@v4
-            - name: Install dependencies
+            - name: Install Maelstrom dependencies
               run: |
                 sudo apt-get update && sudo apt-get install -y \
                     openjdk-17-jdk \
@@ -31,6 +34,6 @@ jobs:
                 toolchain: stable
             - name: Run tests
               run: |
-                cargo test
+                cargo test test_${{ matrix.test }}
 
                  

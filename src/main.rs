@@ -21,7 +21,7 @@ fn main() -> color_eyre::Result<()> {
 
     let requests = Deserializer::from_reader(stdin).into_iter::<Message>();
 
-    let duration = Duration::from_millis(300);
+    let duration = Duration::from_millis(100);
     let mut now = Instant::now();
 
     for request in requests.flatten() {

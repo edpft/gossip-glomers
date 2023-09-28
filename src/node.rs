@@ -1,4 +1,8 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    thread,
+    time::Duration,
+};
 
 use tracing::{error, info};
 use uuid::Uuid;
@@ -273,6 +277,9 @@ impl Node {
                     node
                 }
                 Payload::Gossip { ids_to_see } => {
+                    let id_number = node_id.id_number();
+                    let duration = Duration::from_micros(id_number as u64);
+                    thread::sleep(duration);
                     let ids_not_seen_by_self: HashSet<usize> =
                         ids_to_see.difference(&ids_seen).copied().collect();
                     let ids_not_seen_by_other: HashSet<usize> =
@@ -330,6 +337,9 @@ impl Node {
             ids_seen_by_neighbours,
         } = self
         {
+            let id_number = node_id.id_number();
+            let duration = Duration::from_micros(id_number as u64);
+            thread::sleep(duration);
             ids_seen_by_neighbours
                 .0
                 .iter()
@@ -409,26 +419,36 @@ fn handle_topology_request(
     msg_id: usize,
     node_id: NodeId,
     node_ids: HashSet<NodeId>,
-    topology: HashMap<NodeId, HashSet<NodeId>>,
+    _: HashMap<NodeId, HashSet<NodeId>>,
     dest: NodeId,
     in_reply_to: impl Into<Option<usize>>,
 ) -> Node {
-    let node = match topology.get(&node_id) {
-        Some(neighbours) => {
-            let neighbours = neighbours.clone();
-            let ids_seen_by_neighbours = IdsSeenByNeighbours::new(neighbours);
-            Node::Networked {
-                msg_id: msg_id + 1,
-                node_id: node_id.clone(),
-                node_ids,
-                ids_seen_by_neighbours,
-            }
+    let index = node_id.id_number();
+    let neighbours = match node_id.is_hub_node() {
+        true => {
+            let mut spoke_nodes = node_ids.clone();
+            spoke_nodes.retain(|node_id| !node_id.is_hub_node());
+            spoke_nodes
         }
-        None => Node::Initialised {
-            msg_id: msg_id + 1,
-            node_id: node_id.clone(),
-            node_ids,
-        },
+        false => {
+            let mut neighbours = HashSet::new();
+            let maximum_index = node_ids.len() - 1;
+            let nextdoor_neighbour_index = if index == maximum_index { 1 } else { index + 1 };
+            let nextdoor_neighbour = NodeId::new(nextdoor_neighbour_index);
+            neighbours.insert(nextdoor_neighbour);
+            let mut hub_nodes = node_ids.clone();
+            hub_nodes.retain(|node_id| node_id.is_hub_node());
+            neighbours.extend(hub_nodes);
+            neighbours
+        }
+    };
+    info!(target: "Neighbours", neighbours = ?neighbours);
+    let ids_seen_by_neighbours = IdsSeenByNeighbours::new(neighbours);
+    let node = Node::Networked {
+        msg_id: msg_id + 1,
+        node_id: node_id.clone(),
+        node_ids,
+        ids_seen_by_neighbours,
     };
     let response_payload = Payload::TopologyOk;
     let response = Message::new(node_id, dest, msg_id, in_reply_to, response_payload);
