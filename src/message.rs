@@ -120,4 +120,9 @@ impl NodeId {
             .to_digit(10)
             .expect("The second character will always be a digit") as usize
     }
+
+    pub fn is_hub_node(&self) -> bool {
+        let id_number = self.id_number();
+        id_number == 0
+    }
 }

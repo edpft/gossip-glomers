@@ -337,7 +337,7 @@ impl Node {
             ids_seen_by_neighbours,
         } = self
         {
-            if node_id.id_number() != 0 {
+            if !node_id.is_hub_node() {
             } else {
                 let id_number = node_id.id_number();
                 let duration = Duration::from_millis(id_number as u64);
@@ -432,14 +432,22 @@ fn handle_topology_request(
     in_reply_to: impl Into<Option<usize>>,
 ) -> Node {
     let index = node_id.id_number();
-    let neighbours = if index == 0 {
-        node_ids.clone()
+    let neighbours = if node_id.is_hub_node() {
+        node_ids
+            .clone()
+            .into_iter()
+            .filter(|node_id| node_id.id_number() != index)
+            .collect()
     } else {
-        let node = NodeId::new("n0");
+        let hub_nodes = node_ids
+            .clone()
+            .into_iter()
+            .filter(|node_id| node_id.is_hub_node());
         let mut neighbours = HashSet::new();
-        neighbours.insert(node);
+        neighbours.extend(hub_nodes);
         neighbours
     };
+    info!(target: "Neighbours", neighbours = ?neighbours);
     let ids_seen_by_neighbours = IdsSeenByNeighbours::new(neighbours);
     let node = Node::Networked {
         msg_id: msg_id + 1,
