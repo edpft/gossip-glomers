@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/edpft/gossip-glomers/compare/v0.5.1...v0.6.0) (2023-09-28)
+
+
+### Features
+
+* **broadcast:** Implement efficient broadcast 1 ([#21](https://github.com/edpft/gossip-glomers/issues/21)) ([4f80709](https://github.com/edpft/gossip-glomers/commit/4f8070981dc6b1f5bcd2bfabf88ebf942b52bd69))
+
 ## [0.5.1](https://github.com/edpft/gossip-glomers/compare/v0.5.0...v0.5.1) (2023-09-24)
 
 
