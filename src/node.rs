@@ -337,32 +337,24 @@ impl Node {
             ids_seen_by_neighbours,
         } = self
         {
-            if !node_id.is_hub_node() {
-            } else {
-                let id_number = node_id.id_number();
-                let duration = Duration::from_millis(id_number as u64);
-                thread::sleep(duration);
-                ids_seen_by_neighbours
-                    .0
-                    .iter()
-                    .for_each(|(neighbour, ids_seen_by_neighbour)| {
-                        let ids_to_see: HashSet<usize> = ids_seen
-                            .difference(ids_seen_by_neighbour)
-                            .copied()
-                            .collect();
-                        if !ids_to_see.is_empty() {
-                            let payload = Payload::Gossip { ids_to_see };
-                            let request = Message::new(
-                                node_id.clone(),
-                                neighbour.clone(),
-                                None,
-                                None,
-                                payload,
-                            );
-                            request.send();
-                        }
-                    })
-            }
+            let id_number = node_id.id_number();
+            let duration = Duration::from_millis(id_number as u64);
+            thread::sleep(duration);
+            ids_seen_by_neighbours
+                .0
+                .iter()
+                .for_each(|(neighbour, ids_seen_by_neighbour)| {
+                    let ids_to_see: HashSet<usize> = ids_seen
+                        .difference(ids_seen_by_neighbour)
+                        .copied()
+                        .collect();
+                    if !ids_to_see.is_empty() {
+                        let payload = Payload::Gossip { ids_to_see };
+                        let request =
+                            Message::new(node_id.clone(), neighbour.clone(), None, None, payload);
+                        request.send();
+                    }
+                })
         }
     }
 }
@@ -432,20 +424,23 @@ fn handle_topology_request(
     in_reply_to: impl Into<Option<usize>>,
 ) -> Node {
     let index = node_id.id_number();
-    let neighbours = if node_id.is_hub_node() {
-        node_ids
-            .clone()
-            .into_iter()
-            .filter(|node_id| node_id.id_number() != index)
-            .collect()
-    } else {
-        let hub_nodes = node_ids
-            .clone()
-            .into_iter()
-            .filter(|node_id| node_id.is_hub_node());
-        let mut neighbours = HashSet::new();
-        neighbours.extend(hub_nodes);
-        neighbours
+    let neighbours = match node_id.is_hub_node() {
+        true => {
+            let mut spoke_nodes = node_ids.clone();
+            spoke_nodes.retain(|node_id| !node_id.is_hub_node());
+            spoke_nodes
+        }
+        false => {
+            let mut neighbours = HashSet::new();
+            let maximum_index = node_ids.len() - 1;
+            let nextdoor_neighbour_index = if index == maximum_index { 1 } else { index + 1 };
+            let nextdoor_neighbour = NodeId::new(nextdoor_neighbour_index);
+            neighbours.insert(nextdoor_neighbour);
+            let mut hub_nodes = node_ids.clone();
+            hub_nodes.retain(|node_id| node_id.is_hub_node());
+            neighbours.extend(hub_nodes);
+            neighbours
+        }
     };
     info!(target: "Neighbours", neighbours = ?neighbours);
     let ids_seen_by_neighbours = IdsSeenByNeighbours::new(neighbours);
