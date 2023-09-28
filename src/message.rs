@@ -108,10 +108,6 @@ pub enum Payload {
 pub struct NodeId(Box<str>);
 
 impl NodeId {
-    pub fn new(id: impl Into<Box<str>>) -> Self {
-        Self(id.into())
-    }
-
     pub fn id_number(&self) -> usize {
         self.0
             .chars()
