@@ -13,7 +13,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
           matrix:
-            test: ["echo", "generate", "single_node_broadcast", "multi_node_broadcast", "fault_tolerant_broadcast", "broadcast_efficiency_1"]
+            test: ["echo", "generate", "single_node_broadcast", "multi_node_broadcast", "fault_tolerant_broadcast", "broadcast_efficiency_1", "broadcast_efficiency_2"]
         steps:
             - name: Checkout repo
               uses: actions/checkout@v4
