@@ -23,6 +23,7 @@ jobs:
             "broadcast_efficiency_1",
             "broadcast_efficiency_2",
             "grow_only_counter",
+            "single_node_kafka",
           ]
     steps:
       - name: Checkout repo
@@ -45,5 +46,3 @@ jobs:
       - name: Run tests
         run: |
           cargo test test_${{ matrix.test }}
-
-
