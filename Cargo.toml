@@ -8,6 +8,10 @@ name = "maelstrom-counter"
 path = "src/g_counter/main.rs"
 
 [[bin]]
+name = "maelstrom-kafka"
+path = "src/kafka/main.rs"
+
+[[bin]]
 name = "gossip-glomers"
 path = "src/main.rs"
 
