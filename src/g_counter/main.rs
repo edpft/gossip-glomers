@@ -2,10 +2,7 @@ mod counter;
 mod message;
 mod node;
 
-use std::{
-    io,
-    time::{Duration, Instant},
-};
+use std::io;
 
 use serde_json::Deserializer;
 use tracing::info;
