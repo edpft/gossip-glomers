@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/edpft/gossip-glomers/compare/v0.7.0...v0.8.0) (2023-10-29)
+
+
+### Features
+
+* **g_counter:** Implement grow-only-counter ([#25](https://github.com/edpft/gossip-glomers/issues/25)) ([3078367](https://github.com/edpft/gossip-glomers/commit/3078367294e4c4c869aa9eada3d603e602402dfb))
+
 ## [0.7.0](https://github.com/edpft/gossip-glomers/compare/v0.6.0...v0.7.0) (2023-09-28)
 
 
