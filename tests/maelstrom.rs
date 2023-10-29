@@ -205,3 +205,27 @@ fn test_broadcast_efficiency_2() -> color_eyre::Result<()> {
     assert!(maximum_latency < 1000.0);
     Ok(())
 }
+
+#[test]
+fn test_grow_only_counter() -> color_eyre::Result<()> {
+    let status = Command::new("./maelstrom/maelstrom")
+        .args([
+            "test",
+            "-w",
+            "g-counter",
+            "--bin",
+            "./target/debug/maelstrom-counter",
+            "--node-count",
+            "3",
+            "--time-limit",
+            "20",
+            "--rate",
+            "100",
+            "--nemesis",
+            "partition",
+        ])
+        .status()
+        .expect("failed to execute process");
+    assert!(status.success());
+    Ok(())
+}

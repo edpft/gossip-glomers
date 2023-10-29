@@ -3,7 +3,13 @@ name = "gossip-glomers"
 version = "0.7.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "maelstrom-counter"
+path = "src/g_counter/main.rs"
+
+[[bin]]
+name = "gossip-glomers"
+path = "src/main.rs"
 
 [dependencies]
 color-eyre = "0.6.2"

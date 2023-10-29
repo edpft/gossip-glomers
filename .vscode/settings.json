@@ -1,0 +1,6 @@
+{
+    "conventionalCommits.scopes": [
+        "broadcast",
+        "g_counter"
+    ]
+}
