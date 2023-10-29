@@ -214,7 +214,7 @@ fn test_grow_only_counter() -> color_eyre::Result<()> {
             "-w",
             "g-counter",
             "--bin",
-            "./target/debug/gossip-glomers",
+            "./target/debug/maelstrom-counter",
             "--node-count",
             "3",
             "--time-limit",
