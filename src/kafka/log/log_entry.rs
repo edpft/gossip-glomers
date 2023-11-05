@@ -26,8 +26,7 @@ impl LogEntry {
 
 impl PartialOrd for LogEntry {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        let cmp = self.cmp(other);
-        Some(cmp)
+        Some(self.cmp(other))
     }
 }
 
