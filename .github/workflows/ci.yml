@@ -24,6 +24,7 @@ jobs:
             "broadcast_efficiency_2",
             "grow_only_counter",
             "single_node_kafka",
+            "multi_node_kafka",
           ]
     steps:
       - name: Checkout repo
