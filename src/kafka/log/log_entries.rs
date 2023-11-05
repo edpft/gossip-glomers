@@ -6,9 +6,9 @@ use super::{LogEntry, LogMessage, LogOffset};
 pub struct LogEntries(Vec<LogEntry>);
 
 impl LogEntries {
-    pub fn new(log_entries: Vec<LogEntry>) -> Self {
-        Self(log_entries)
-    }
+    // pub fn new(log_entries: Vec<LogEntry>) -> Self {
+    //     Self(log_entries)
+    // }
 
     pub fn iter(&self) -> impl Iterator<Item = &LogEntry> {
         self.0.iter()
@@ -37,15 +37,15 @@ impl LogEntries {
         self.0.extend(log_entries.iter().cloned());
     }
 
-    pub fn insert_message(&mut self, offset: LogOffset, message: LogMessage) {
-        let log_entry = LogEntry::new(offset, message);
-        self.insert_entry(log_entry);
-    }
+    // pub fn insert_message(&mut self, offset: LogOffset, message: LogMessage) {
+    //     let log_entry = LogEntry::new(offset, message);
+    //     self.insert_entry(log_entry);
+    // }
 
-    pub fn insert_entry(&mut self, entry: LogEntry) {
-        self.append_entry(entry);
-        self.0.sort();
-    }
+    // pub fn insert_entry(&mut self, entry: LogEntry) {
+    //     self.append_entry(entry);
+    //     self.0.sort();
+    // }
 
     pub fn since_offset(&self, offset: &LogOffset) -> Self {
         self.iter()

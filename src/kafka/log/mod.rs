@@ -1,4 +1,3 @@
-mod log;
 mod log_entries;
 mod log_entry;
 mod log_key;
@@ -7,8 +6,8 @@ mod log_offset;
 mod logs;
 mod messages;
 mod offsets;
+mod single_log;
 
-pub use log::Log;
 pub use log_entries::LogEntries;
 pub use log_entry::LogEntry;
 pub use log_key::LogKey;
@@ -17,6 +16,7 @@ pub use log_offset::LogOffset;
 pub use logs::Logs;
 pub use messages::Messages;
 pub use offsets::Offsets;
+pub use single_log::Log;
 
 #[cfg(test)]
 mod tests {

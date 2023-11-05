@@ -44,23 +44,23 @@ impl Logs {
         }
     }
 
-    pub fn insert_message(
-        &mut self,
-        key: impl Into<LogKey>,
-        offset: impl Into<LogOffset>,
-        message: impl Into<LogMessage>,
-    ) -> Option<()> {
-        let key = key.into();
-        match self.0.get_mut(&key) {
-            Some(log) => log.insert_message(offset.into(), message.into()),
-            None => {
-                let mut log = Log::default();
-                log.insert_message(offset.into(), message.into());
-                self.0.insert(key, log);
-            }
-        }
-        Some(())
-    }
+    // pub fn insert_message(
+    //     &mut self,
+    //     key: impl Into<LogKey>,
+    //     offset: impl Into<LogOffset>,
+    //     message: impl Into<LogMessage>,
+    // ) -> Option<()> {
+    //     let key = key.into();
+    //     match self.0.get_mut(&key) {
+    //         Some(log) => log.insert_message(offset.into(), message.into()),
+    //         None => {
+    //             let mut log = Log::default();
+    //             log.insert_message(offset.into(), message.into());
+    //             self.0.insert(key, log);
+    //         }
+    //     }
+    //     Some(())
+    // }
 
     pub fn since_offset(&mut self, mut offsets: Offsets) -> Self {
         let mut logs = Logs::default();

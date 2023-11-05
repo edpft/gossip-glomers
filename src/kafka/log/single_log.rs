@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::{LogEntries, LogEntry, LogMessage, LogOffset, Messages};
+use super::{LogEntries, LogMessage, LogOffset};
 
 #[derive(Debug, Default, Deserialize, PartialEq, Eq, PartialOrd, Hash, Serialize, Clone)]
 pub struct Log {
@@ -13,17 +13,17 @@ impl Log {
         self.entries.append_message(message)
     }
 
-    pub fn append_entry(&mut self, entry: LogEntry) {
-        self.entries.append_entry(entry)
-    }
+    // pub fn append_entry(&mut self, entry: LogEntry) {
+    //     self.entries.append_entry(entry)
+    // }
 
     pub fn append_entries(&mut self, entries: LogEntries) {
         self.entries.append_entries(entries)
     }
 
-    pub fn insert_message(&mut self, offset: LogOffset, message: LogMessage) {
-        self.entries.insert_message(offset, message)
-    }
+    // pub fn insert_message(&mut self, offset: LogOffset, message: LogMessage) {
+    //     self.entries.insert_message(offset, message)
+    // }
 
     pub fn since_offset(&self, offset: &LogOffset) -> LogEntries {
         self.entries.since_offset(offset)
