@@ -229,3 +229,27 @@ fn test_grow_only_counter() -> color_eyre::Result<()> {
     assert!(status.success());
     Ok(())
 }
+
+#[test]
+fn test_single_node_kafka() -> color_eyre::Result<()> {
+    let status = Command::new("./maelstrom/maelstrom")
+        .args([
+            "test",
+            "-w",
+            "kafka",
+            "--bin",
+            "./target/debug/maelstrom-kafka",
+            "--node-count",
+            "1",
+            "--concurrency",
+            "2n",
+            "--time-limit",
+            "20",
+            "--rate",
+            "1000",
+        ])
+        .status()
+        .expect("failed to execute process");
+    assert!(status.success());
+    Ok(())
+}
