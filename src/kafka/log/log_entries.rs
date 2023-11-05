@@ -37,15 +37,17 @@ impl LogEntries {
         self.0.extend(log_entries.iter().cloned());
     }
 
-    // pub fn insert_message(&mut self, offset: LogOffset, message: LogMessage) {
-    //     let log_entry = LogEntry::new(offset, message);
-    //     self.insert_entry(log_entry);
-    // }
+    #[allow(dead_code)]
+    pub fn insert_message(&mut self, offset: LogOffset, message: LogMessage) {
+        let log_entry = LogEntry::new(offset, message);
+        self.insert_entry(log_entry);
+    }
 
-    // pub fn insert_entry(&mut self, entry: LogEntry) {
-    //     self.append_entry(entry);
-    //     self.0.sort();
-    // }
+    #[allow(dead_code)]
+    pub fn insert_entry(&mut self, entry: LogEntry) {
+        self.append_entry(entry);
+        self.0.sort();
+    }
 
     pub fn since_offset(&self, offset: &LogOffset) -> Self {
         self.iter()

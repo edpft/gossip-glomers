@@ -21,9 +21,10 @@ impl Log {
         self.entries.append_entries(entries)
     }
 
-    // pub fn insert_message(&mut self, offset: LogOffset, message: LogMessage) {
-    //     self.entries.insert_message(offset, message)
-    // }
+    #[allow(dead_code)]
+    pub fn insert_message(&mut self, offset: LogOffset, message: LogMessage) {
+        self.entries.insert_message(offset, message)
+    }
 
     pub fn since_offset(&self, offset: &LogOffset) -> LogEntries {
         self.entries.since_offset(offset)
