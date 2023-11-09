@@ -1,30 +1,18 @@
-[package]
-name = "gossip-glomers"
-version = "0.9.0"
-edition = "2021"
+[workspace]
 
-[[bin]]
-name = "maelstrom-counter"
-path = "src/g_counter/main.rs"
+members = [
+    "broadcast",
+    "counter",
+    "echo",
+    "kafka",
+    "protocol",
+    "tests",
+    "unique-ids",
+]
 
-[[bin]]
-name = "maelstrom-kafka"
-path = "src/kafka/main.rs"
-
-[[bin]]
-name = "gossip-glomers"
-path = "src/main.rs"
-
-[dependencies]
+[workspace.dependencies]
 color-eyre = "0.6.2"
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.107"
-serde_tuple = "0.5.0"
-thiserror = "1.0.48"
 tracing = "0.1.37"
 tracing-subscriber = "0.3.17"
-uuid = { version = "1.4.1", features = ["serde", "v4"] }
-
-[dev-dependencies]
-edn-rs = "0.17.4"
-regex = "1.9.5"
