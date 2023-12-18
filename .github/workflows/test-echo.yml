@@ -6,7 +6,7 @@ on:
 jobs:
   test:
     name: Test Echo Binary
-    uses: ./.github/workflow/test.yml@main
+    uses: ./.github/workflows/test.yml
     with:
       test-name: echo
       test-args: --node-count 1 --time-limit 10
