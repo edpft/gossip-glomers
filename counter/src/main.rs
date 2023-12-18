@@ -33,6 +33,7 @@ fn main() -> color_eyre::Result<()> {
             now = Instant::now();
         }
     }
+    node.gossip();
     Ok(())
 }
 
