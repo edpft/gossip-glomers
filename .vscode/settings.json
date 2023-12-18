@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "broadcast",
         "g_counter",
-        "kafka"
+        "kafka",
+        "echo"
     ]
 }

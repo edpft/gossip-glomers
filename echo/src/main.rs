@@ -1,27 +1,27 @@
-mod log;
-mod message;
 mod node;
+mod payload;
 
 use std::io;
 
+use maelstrom_protocol::{messages::Message, nodes::Node};
 use serde_json::Deserializer;
 use tracing::info;
 use tracing_subscriber::filter::LevelFilter;
 
-use crate::{message::Message, node::Node};
+use crate::{node::EchoNode, payload::EchoPayload};
 
 fn main() -> color_eyre::Result<()> {
     initialise_tracing();
-    let mut node = Node::new();
+    let mut node = EchoNode::new();
 
     let stdin = io::stdin();
     info!("Got stdin");
 
-    let requests = Deserializer::from_reader(stdin).into_iter::<Message>();
-
+    let requests = Deserializer::from_reader(stdin).into_iter::<Message<EchoPayload>>();
     for request in requests.flatten() {
         node = node.handle(request);
     }
+
     Ok(())
 }
 

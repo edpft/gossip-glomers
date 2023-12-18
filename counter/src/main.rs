@@ -1,27 +1,29 @@
-mod message;
+mod counter;
 mod node;
+mod payload;
 
 use std::{
     io,
     time::{Duration, Instant},
 };
 
+use maelstrom_protocol::{gossip::Gossip, messages::Message, nodes::Node};
 use serde_json::Deserializer;
 use tracing::info;
 use tracing_subscriber::filter::LevelFilter;
 
-use crate::{message::Message, node::Node};
+use crate::{node::CounterNode, payload::CounterPayload};
 
 fn main() -> color_eyre::Result<()> {
     initialise_tracing();
-    let mut node = Node::new();
+    let mut node = CounterNode::new();
 
     let stdin = io::stdin();
     info!("Got stdin");
 
-    let requests = Deserializer::from_reader(stdin).into_iter::<Message>();
+    let requests = Deserializer::from_reader(stdin).into_iter::<Message<CounterPayload>>();
 
-    let duration = Duration::from_millis(100);
+    let duration = Duration::from_millis(95);
     let mut now = Instant::now();
 
     for request in requests.flatten() {

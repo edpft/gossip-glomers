@@ -1,0 +1,13 @@
+name: Test `unique-ids` binary
+on:
+  pull_request:
+    paths:
+      - "unique-ids/**"
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: unique-ids
+      test-args: --node-count 3 --time-limit 30 --rate 100 --availability total --nemesis partition
+      binary-name: maelstrom-unique-ids

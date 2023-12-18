@@ -1,0 +1,13 @@
+name: Test `counter` Binary
+on:
+  pull_request:
+    paths:
+      - "counter/**"
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: g-counter
+      test-args: --node-count 3 --time-limit 20 --rate 100 --nemesis partition
+      binary-name: maelstrom-counter

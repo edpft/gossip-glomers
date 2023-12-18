@@ -1,0 +1,22 @@
+[package]
+name = "maelstrom-kafka"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+path = "src/main.rs"
+name = "maelstrom-kafka"
+
+[lib]
+path = "src/lib.rs"
+name = "maelstrom_kafka"
+
+
+[dependencies]
+maelstrom_protocol = { path = "../protocol" }
+color-eyre = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde_tuple = "0.5.0"

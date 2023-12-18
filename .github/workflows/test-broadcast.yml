@@ -1,0 +1,46 @@
+name: Test `broadcast` binary
+on:
+  pull_request:
+    paths:
+      - "broadcast/**"
+
+jobs:
+  single-node-broadcast:
+    name: Single node broadcast
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 1 --time-limit 20 --rate 10
+      binary-name: maelstrom-broadcast
+
+  multi-node-broadcast:
+    name: Multi node broadcast
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 5 --time-limit 20 --rate 10
+      binary-name: maelstrom-broadcast
+
+  fault-tolerant-broadcast:
+    name: Fault tolerant broadcastt
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 5 --time-limit 20 --rate 10 --nemesis partition
+      binary-name: maelstrom-broadcast
+
+  broadcast-efficiency-1:
+    name: Broadcast efficientcy 1
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 25 --time-limit 20 --rate 100 --latency 100
+      binary-name: maelstrom-broadcast
+
+  broadcast-efficiency-2:
+    name: Broadcast efficientcy 2
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 25 --time-limit 20 --rate 100 --latency 100
+      binary-name: maelstrom-broadcast

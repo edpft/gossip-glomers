@@ -84,13 +84,19 @@ impl Logs {
     }
 
     pub fn list_committed_offsets(&mut self, keys: Vec<LogKey>) -> Offsets {
-        let mut offset = Offsets::default();
+        let mut offsets = Offsets::default();
         keys.iter().for_each(|key| {
-            if let Some(log) = self.0.get(key) {
-                offset.insert_offset(key.clone(), log.committed_offset().cloned())
-            }
+            let Some(log) = self.0.get(key) else {
+                offsets.insert_offset(key.clone(), Some(LogOffset::default()));
+                return;
+            };
+            let Some(offset) = log.committed_offset().cloned() else {
+                offsets.insert_offset(key.clone(), Some(LogOffset::default()));
+                return;
+            };
+            offsets.insert_offset(key.clone(), Some(offset))
         });
-        offset
+        offsets
     }
 
     pub fn as_messages(&self) -> Messages {

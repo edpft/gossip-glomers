@@ -1,0 +1,12 @@
+[package]
+name = "maelstrom-echo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+maelstrom_protocol = { path = "../protocol" }
+color-eyre = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

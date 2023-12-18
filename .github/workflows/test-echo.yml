@@ -1,0 +1,13 @@
+name: Test `echo` binary
+on:
+  pull_request:
+    paths:
+      - "echo/**"
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: echo
+      test-args: --node-count 1 --time-limit 10
+      binary-name: maelstrom-echo
