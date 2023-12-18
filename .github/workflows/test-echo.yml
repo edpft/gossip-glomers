@@ -1,3 +1,4 @@
+name: Test `echo` binary
 on:
   pull_request:
     paths:
@@ -5,7 +6,6 @@ on:
 
 jobs:
   test:
-    name: Test Echo Binary
     uses: ./.github/workflows/test.yml
     with:
       test-name: echo

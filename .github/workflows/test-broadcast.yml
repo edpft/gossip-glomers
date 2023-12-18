@@ -1,44 +1,46 @@
+name: Test `broadcast` binary
 on:
   pull_request:
     paths:
-      - "broadcast/*"
-  workflow_run:
-    workflows: ["Continuous integration"]
-    types:
-      - completed
+      - "broadcast/**"
 
 jobs:
-  test:
-    name: Test Unique Ids Binary
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test:
-          [
-            "single_node_broadcast",
-            "multi_node_broadcast",
-            "fault_tolerant_broadcast",
-            "broadcast_efficiency_1",
-            "broadcast_efficiency_2",
-          ]
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Install Maelstrom dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y \
-              openjdk-17-jdk \
-              graphviz \
-              gnuplot
-      - name: Install Maelstrom
-        run: |
-          wget https://github.com/jepsen-io/maelstrom/releases/download/v0.2.3/maelstrom.tar.bz2
-          tar -xf maelstrom.tar.bz2
-          rm -rf maelstrom.tar.bz2
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
-      - name: Run tests
-        run: |
-          cargo test test_${{ matrix.test }}
+  single-node-broadcast:
+    name: Single node broadcast
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 1 --time-limit 20 --rate 10
+      binary-name: maelstrom-broadcast
+
+  multi-node-broadcast:
+    name: Multi node broadcast
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 5 --time-limit 20 --rate 10
+      binary-name: maelstrom-broadcast
+
+  fault-tolerant-broadcast:
+    name: Fault tolerant broadcastt
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 5 --time-limit 20 --rate 10 --nemesis partition
+      binary-name: maelstrom-broadcast
+
+  broadcast-efficiency-1:
+    name: Broadcast efficientcy 1
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 25 --time-limit 20 --rate 100 --latency 100
+      binary-name: maelstrom-broadcast
+
+  broadcast-efficiency-2:
+    name: Broadcast efficientcy 2
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: broadcast
+      test-args: --node-count 25 --time-limit 20 --rate 100 --latency 100
+      binary-name: maelstrom-broadcast

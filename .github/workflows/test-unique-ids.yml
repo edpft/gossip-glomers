@@ -1,34 +1,13 @@
+name: Test `unique-ids` binary
 on:
   pull_request:
     paths:
-      - "unique-ids/*"
-  workflow_run:
-    workflows: ["Continuous integration"]
-    types:
-      - completed
+      - "unique-ids/**"
 
 jobs:
   test:
-    name: Test Unique Ids Binary
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Install Maelstrom dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y \
-              openjdk-17-jdk \
-              graphviz \
-              gnuplot
-      - name: Install Maelstrom
-        run: |
-          wget https://github.com/jepsen-io/maelstrom/releases/download/v0.2.3/maelstrom.tar.bz2
-          tar -xf maelstrom.tar.bz2
-          rm -rf maelstrom.tar.bz2
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
-      - name: Run tests
-        run: |
-          cargo test test_unique_ids
+    uses: ./.github/workflows/test.yml
+    with:
+      test-name: unique-ids
+      test-args: --node-count 3 --time-limit 30 --rate 100 --availability total --nemesis partition
+      binary-name: maelstrom-unique-ids
