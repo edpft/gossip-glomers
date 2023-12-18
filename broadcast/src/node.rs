@@ -30,12 +30,6 @@ pub enum BroadcastNode {
         node_id: NodeId,
         node_ids: HashSet<NodeId>,
         ids_seen: HashSet<usize>,
-    },
-    NetworkedBroadcasting {
-        msg_id: MessageId,
-        node_id: NodeId,
-        node_ids: HashSet<NodeId>,
-        ids_seen: HashSet<usize>,
         ids_seen_by_neighbours: IdsSeenByNeighbours,
     },
 }
@@ -54,19 +48,13 @@ impl Node<BroadcastPayload> for BroadcastNode {
                 node_id,
                 node_ids: _,
             }
-            | BroadcastNode::Broadcasting {
-                msg_id: _,
-                node_id,
-                node_ids: _,
-                ids_seen: _,
-            }
             | BroadcastNode::Networked {
                 msg_id: _,
                 node_id,
                 node_ids: _,
                 ids_seen_by_neighbours: _,
             }
-            | BroadcastNode::NetworkedBroadcasting {
+            | BroadcastNode::Broadcasting {
                 msg_id: _,
                 node_id,
                 node_ids: _,
@@ -84,19 +72,13 @@ impl Node<BroadcastPayload> for BroadcastNode {
                 node_id: _,
                 node_ids: _,
             }
-            | BroadcastNode::Broadcasting {
-                msg_id,
-                node_id: _,
-                node_ids: _,
-                ids_seen: _,
-            }
             | BroadcastNode::Networked {
                 msg_id,
                 node_id: _,
                 node_ids: _,
                 ids_seen_by_neighbours: _,
             }
-            | BroadcastNode::NetworkedBroadcasting {
+            | BroadcastNode::Broadcasting {
                 msg_id,
                 node_id: _,
                 node_ids: _,
@@ -172,67 +154,6 @@ impl Node<BroadcastPayload> for BroadcastNode {
                     (node, None)
                 }
             },
-            BroadcastNode::Broadcasting {
-                msg_id,
-                node_id,
-                node_ids,
-                mut ids_seen,
-            } => match &request.body.payload {
-                BroadcastPayload::Broadcast { message } => {
-                    ids_seen.insert(*message);
-                    let node = BroadcastNode::Broadcasting {
-                        msg_id: msg_id.increment(),
-                        node_id: node_id.clone(),
-                        node_ids: node_ids.clone(),
-                        ids_seen,
-                    };
-                    let payload = BroadcastPayload::BroadcastOk;
-                    (node, Some(payload))
-                }
-                BroadcastPayload::Read => {
-                    let node = BroadcastNode::Broadcasting {
-                        msg_id: msg_id.increment(),
-                        node_id: node_id.clone(),
-                        node_ids: node_ids.clone(),
-                        ids_seen: ids_seen.clone(),
-                    };
-                    let payload = BroadcastPayload::ReadOk {
-                        messages: ids_seen.clone(),
-                    };
-                    (node, Some(payload))
-                }
-                BroadcastPayload::Gossip { ids_to_see } => {
-                    let ids_not_seen_by_self: HashSet<usize> =
-                        ids_to_see.difference(&ids_seen).copied().collect();
-                    let ids_not_seen_by_other: HashSet<usize> =
-                        ids_seen.difference(ids_to_see).copied().collect();
-                    ids_seen.extend(ids_not_seen_by_self);
-                    let node = BroadcastNode::Broadcasting {
-                        msg_id: msg_id.clone(),
-                        node_id: node_id.clone(),
-                        node_ids: node_ids.clone(),
-                        ids_seen,
-                    };
-                    if ids_not_seen_by_other.is_empty() {
-                        (node, None)
-                    } else {
-                        let payload = BroadcastPayload::GossipOk {
-                            ids_to_see: ids_not_seen_by_other,
-                        };
-                        (node, Some(payload))
-                    }
-                }
-                unexpected_payload => {
-                    error!(target: "invalid payload", node_type = "Broadcasting", payload = ?unexpected_payload);
-                    let node = BroadcastNode::Broadcasting {
-                        msg_id: msg_id.clone(),
-                        node_id: node_id.clone(),
-                        node_ids: node_ids.clone(),
-                        ids_seen,
-                    };
-                    (node, None)
-                }
-            },
             BroadcastNode::Networked {
                 msg_id,
                 node_id,
@@ -242,7 +163,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
                 BroadcastPayload::Broadcast { message } => {
                     let mut ids_seen = HashSet::new();
                     ids_seen.insert(message);
-                    let node = BroadcastNode::NetworkedBroadcasting {
+                    let node = BroadcastNode::Broadcasting {
                         msg_id: msg_id.increment(),
                         node_id: node_id.clone(),
                         node_ids: node_ids.clone(),
@@ -254,7 +175,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
                 }
                 BroadcastPayload::Read => {
                     let ids_seen = HashSet::new();
-                    let node = BroadcastNode::NetworkedBroadcasting {
+                    let node = BroadcastNode::Broadcasting {
                         msg_id: msg_id.increment(),
                         node_id: node_id.clone(),
                         node_ids: node_ids.clone(),
@@ -266,7 +187,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
                 }
                 BroadcastPayload::Gossip { ids_to_see } => {
                     ids_seen_by_neighbours.update(request.src.clone(), ids_to_see.clone());
-                    let node = BroadcastNode::NetworkedBroadcasting {
+                    let node = BroadcastNode::Broadcasting {
                         msg_id: msg_id.clone(),
                         node_id: node_id.clone(),
                         node_ids: node_ids.clone(),
@@ -289,7 +210,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
                     (node, None)
                 }
             },
-            Self::NetworkedBroadcasting {
+            Self::Broadcasting {
                 msg_id,
                 node_id,
                 node_ids,
@@ -298,7 +219,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
             } => match &request.body.payload {
                 BroadcastPayload::Broadcast { message } => {
                     ids_seen.insert(*message);
-                    let node = BroadcastNode::NetworkedBroadcasting {
+                    let node = BroadcastNode::Broadcasting {
                         msg_id: msg_id.increment(),
                         node_id: node_id.clone(),
                         node_ids: node_ids.clone(),
@@ -309,7 +230,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
                     (node, Some(payload))
                 }
                 BroadcastPayload::Read => {
-                    let node = BroadcastNode::NetworkedBroadcasting {
+                    let node = BroadcastNode::Broadcasting {
                         msg_id: msg_id.increment(),
                         node_id: node_id.clone(),
                         node_ids: node_ids.clone(),
@@ -328,7 +249,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
                     let ids_not_seen_by_other: HashSet<usize> =
                         ids_seen.difference(ids_to_see).copied().collect();
                     ids_seen.extend(ids_not_seen_by_self);
-                    let node = BroadcastNode::NetworkedBroadcasting {
+                    let node = BroadcastNode::Broadcasting {
                         msg_id: msg_id.clone(),
                         node_id: node_id.clone(),
                         node_ids: node_ids.clone(),
@@ -347,7 +268,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
                 BroadcastPayload::GossipOk { ids_to_see } => {
                     ids_seen.extend(ids_to_see.clone());
                     ids_seen_by_neighbours.update(request.src().clone(), ids_to_see.clone());
-                    let node = BroadcastNode::NetworkedBroadcasting {
+                    let node = BroadcastNode::Broadcasting {
                         msg_id: msg_id.clone(),
                         node_id: node_id.clone(),
                         node_ids: node_ids.clone(),
@@ -357,8 +278,8 @@ impl Node<BroadcastPayload> for BroadcastNode {
                     (node, None)
                 }
                 payload => {
-                    error!(target: "invalid payload", node_type="NetworkedBroadcasting", payload = ?payload);
-                    let node = BroadcastNode::NetworkedBroadcasting {
+                    error!(target: "invalid payload", node_type="Broadcasting", payload = ?payload);
+                    let node = BroadcastNode::Broadcasting {
                         msg_id: msg_id.clone(),
                         node_id: node_id.clone(),
                         node_ids: node_ids.clone(),
@@ -385,7 +306,7 @@ impl Node<BroadcastPayload> for BroadcastNode {
 
 impl Gossip for BroadcastNode {
     fn gossip(&self) {
-        if let BroadcastNode::NetworkedBroadcasting {
+        if let BroadcastNode::Broadcasting {
             msg_id: _,
             node_id,
             node_ids: _,
