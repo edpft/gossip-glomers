@@ -23,7 +23,7 @@ fn test_echo() -> color_eyre::Result<()> {
 }
 
 #[test]
-fn test_generate() -> color_eyre::Result<()> {
+fn test_unique_ids() -> color_eyre::Result<()> {
     let status = Command::new("../maelstrom/maelstrom")
         .args([
             "test",
